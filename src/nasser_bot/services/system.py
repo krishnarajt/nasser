@@ -273,6 +273,7 @@ class SystemService:
 
         result = await self._runner.run([self._config.smartctl_bin, "-a", "-j", device], sudo=True)
         if not result.ok and not result.stdout.strip():
+            error_message = _smart_error_message(result, device, self._config)
             return DiskSmart(
                 device=device,
                 ok=False,
@@ -282,7 +283,7 @@ class SystemService:
                 temperature_celsius=None,
                 power_on_hours=None,
                 raw={},
-                error=result.combined_output,
+                error=error_message,
             )
 
         try:
@@ -574,6 +575,27 @@ def _raid_status_sync() -> str | None:
         return None
     has_array = any(line.startswith("md") for line in content.splitlines())
     return content.strip() if has_array else None
+
+
+def _smart_error_message(result: CommandResult, device: str, config: Config) -> str:
+    stderr = (result.stderr or result.stdout).strip()
+    if not stderr:
+        return result.combined_output
+
+    lowered = stderr.lower()
+    if any(token in lowered for token in ("password is required", "a password is required")):
+        return (
+            "passwordless sudo is required for smartctl. Install the sudoers template "
+            f"from deploy/sudoers.d/nasser or add a matching rule for {config.smartctl_bin} "
+            f"-a -j {device}."
+        )
+    if "not in sudoers" in lowered or "not allowed" in lowered:
+        return (
+            "sudo permission for smartctl is not configured. Install the sudoers template "
+            f"from deploy/sudoers.d/nasser or add a matching rule for {config.smartctl_bin} "
+            f"-a -j {device}."
+        )
+    return stderr
 
 
 def _smart_health(payload: dict[str, Any]) -> str:

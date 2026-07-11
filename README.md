@@ -457,6 +457,10 @@ sudo chown nasser:nasser /var/lib/nasser
 # New env vars (defaults are fine; add if you want to override).
 echo 'NASSER_STATE_PATH=/var/lib/nasser/settings.json' | sudo tee -a /etc/nasser/nasser.env
 
+sudo install -m 0440 -o root -g root /opt/nasser/deploy/sudoers.d/nasser /etc/sudoers.d/nasser
+sudo visudo -cf /etc/sudoers.d/nasser
+/etc/sudoers.d/nasser: parsed OK
+
 # Fix the placeholder disk if you still have it configured:
 # either clear NASSER_DISK_DEVICES in /etc/nasser/nasser.env and pick disks
 # from Telegram -> Settings -> SMART disks, or set real /dev/disk/by-id paths.
