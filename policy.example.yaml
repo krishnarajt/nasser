@@ -1,0 +1,78 @@
+# Everything in this section can also be adjusted live from Telegram:
+#   /menu -> Settings -> Thresholds
+# Telegram-made changes are stored in NASSER_STATE_PATH and take precedence.
+thresholds:
+  disk_usage_warning_percent: 85
+  disk_usage_critical_percent: 95
+  disk_temp_warning_c: 45
+  disk_temp_critical_c: 55
+  memory_warning_percent: 90
+  memory_critical_percent: 97
+  cpu_warning_percent: 90
+  cpu_temp_warning_c: 80
+  cpu_temp_critical_c: 90
+  load1_warning_per_cpu: 2.0
+  backup_stale_warning_hours: 30
+
+system:
+  # Optional extra limiter on top of NASSER_RESTARTABLE_SERVICES.
+  restart_allowed:
+    - k3s
+    - docker
+
+docker:
+  restart:
+    # Set false when you are ready to require explicit names or labels.
+    allow_all: true
+    allowed_names: []
+    required_labels: {}
+    # Safer example:
+    # allow_all: false
+    # required_labels:
+    #   nasser.restart: "true"
+
+  compose_projects:
+    # - name: media
+    #   path: /opt/stacks/media
+    #   files:
+    #     - compose.yaml
+    #   services:
+    #     - plex
+    #     - jellyfin
+    #   sudo: false
+
+backups:
+  jobs:
+    # - name: restic
+    #   run_command:
+    #     - /usr/local/bin/run-restic-backup
+    #   status_file: /var/lib/nasser/backups/restic-last-success
+    #   stale_after_hours: 30
+    #   log_unit: restic-backup.service
+    #   sudo: true
+    #
+    # - name: borg
+    #   status_command:
+    #     - /usr/local/bin/borg-status
+    #   log_unit: borg-backup.service
+
+network:
+  public_ip_url: https://api.ipify.org
+  ping_hosts:
+    - 1.1.1.1
+    - 8.8.8.8
+  dns_hosts:
+    - debian.org
+    - github.com
+  port_checks:
+    # - name: router
+    #   host: 192.168.1.1
+    #   port: 80
+    #   timeout_seconds: 3
+    # - name: k3s api
+    #   host: 127.0.0.1
+    #   port: 6443
+
+ups:
+  enabled: false
+  target: ups@localhost

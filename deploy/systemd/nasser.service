@@ -1,0 +1,38 @@
+[Unit]
+Description=Nasser Telegram NAS controller
+Wants=network-online.target
+After=network-online.target docker.service k3s.service
+
+[Service]
+Type=simple
+User=nasser
+Group=nasser
+WorkingDirectory=/opt/nasser
+EnvironmentFile=/etc/nasser/nasser.env
+ExecStart=/opt/nasser/.venv/bin/nasser-bot
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+UMask=0077
+
+# Moderate hardening.
+#
+# CAREFUL: for a non-root User=, any seccomp-backed sandbox option
+# (ProtectKernelTunables, ProtectKernelModules, ProtectKernelLogs,
+# ProtectClock, ProtectHostname, PrivateDevices, LockPersonality,
+# MemoryDenyWriteExecute, RestrictRealtime, RestrictSUIDSGID,
+# RestrictAddressFamilies, RestrictNamespaces, SystemCallFilter, ...)
+# silently implies NoNewPrivileges=yes, which breaks sudo:
+#   "sudo: The 'no new privileges' flag is set"
+# Only mount-namespace options are safe here. Do not add options from the
+# list above while NASSER_USE_SUDO=true.
+#
+# Verify after changes (must print "NoNewPrivs: 0"):
+#   grep NoNewPrivs /proc/$(systemctl show -p MainPID --value nasser)/status
+PrivateTmp=true
+ProtectHome=read-only
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target
+

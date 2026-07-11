@@ -1,0 +1,31 @@
+# Template for /etc/sudoers.d/nasser
+# Validate after editing with:
+#   sudo visudo -cf /etc/sudoers.d/nasser
+#
+# Keep this narrow. These commands are used by deterministic Telegram buttons only.
+
+Defaults:nasser !requiretty
+
+# Service restarts exposed through NASSER_RESTARTABLE_SERVICES.
+nasser ALL=(root) NOPASSWD: /bin/systemctl restart k3s
+nasser ALL=(root) NOPASSWD: /usr/bin/systemctl restart k3s
+nasser ALL=(root) NOPASSWD: /bin/systemctl restart docker
+nasser ALL=(root) NOPASSWD: /usr/bin/systemctl restart docker
+
+# Add one pair of lines per extra service you enable under
+# Telegram -> Settings -> Restart services. Example for jellyfin:
+# nasser ALL=(root) NOPASSWD: /bin/systemctl restart jellyfin
+# nasser ALL=(root) NOPASSWD: /usr/bin/systemctl restart jellyfin
+#
+# Convenient but broad alternative (lets the bot restart ANY unit that you
+# enable from Telegram; the bot still requires a confirmation button):
+# nasser ALL=(root) NOPASSWD: /bin/systemctl restart *
+# nasser ALL=(root) NOPASSWD: /usr/bin/systemctl restart *
+
+# SMART details for configured disks.
+nasser ALL=(root) NOPASSWD: /usr/sbin/smartctl -a -j /dev/*
+nasser ALL=(root) NOPASSWD: /usr/sbin/smartctl -a -j /dev/disk/by-id/*
+
+# Add exact backup commands here only if a policy.yaml backup job has sudo: true.
+# Example:
+# nasser ALL=(root) NOPASSWD: /usr/local/bin/run-restic-backup

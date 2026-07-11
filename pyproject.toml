@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nasser"
+version = "0.1.0"
+description = "Deterministic Telegram control bot for a Debian NAS with Docker and single-node k3s."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Nasser maintainers" }
+]
+dependencies = [
+  "docker>=7.1,<8",
+  "kubernetes>=31,<35",
+  "psutil>=6,<8",
+  "PyYAML>=6,<7",
+  "python-telegram-bot>=21.8,<23",
+]
+
+[project.scripts]
+nasser-bot = "nasser_bot.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nasser_bot"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
